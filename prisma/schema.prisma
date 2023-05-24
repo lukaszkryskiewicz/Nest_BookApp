@@ -21,7 +21,7 @@ model Book {
   id     String @id @default(uuid())
   title  String @unique
   rating Int
-  price  String
+  price  Int
 
   author   Author? @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId String?

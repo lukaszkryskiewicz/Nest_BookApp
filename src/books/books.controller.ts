@@ -15,31 +15,31 @@ import { UpdateBookDTO } from './dtos/update-book.dto';
 
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksServices: BooksService) { }
+  constructor(private booksService: BooksService) { }
 
   @Get('/')
   getAll(): any {
-    return this.booksServices.getAll();
+    return this.booksService.getAll();
   }
 
   @Get('/:id')
   async getById(@Param('id', new ParseUUIDPipe()) id: string): Promise<any> {
-    const book = await this.booksServices.getById(id);
+    const book = await this.booksService.getById(id);
     if (!book) throw new NotFoundException('Book not found');
     return book;
   }
 
   @Delete('/:id')
   async deleteBook(@Param('id', new ParseUUIDPipe()) id: string): Promise<any> {
-    if (!(await this.booksServices.getById(id)))
+    if (!(await this.booksService.getById(id)))
       throw new NotFoundException('Book not found!');
-    await this.booksServices.deleteBook(id);
+    await this.booksService.deleteBook(id);
     return { success: true };
   }
 
   @Post('/')
   createBook(@Body() bookData: CreateBookDTO) {
-    return this.booksServices.createBook(bookData);
+    return this.booksService.createBook(bookData);
   }
 
   @Put('/:id')
@@ -47,9 +47,9 @@ export class BooksController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() bookData: UpdateBookDTO,
   ) {
-    if (!(await this.booksServices.getById(id)))
+    if (!(await this.booksService.getById(id)))
       throw new NotFoundException('Book not found!');
-    await this.booksServices.updateBook(id, bookData);
+    await this.booksService.updateBook(id, bookData);
     return { success: true };
   }
 }

@@ -1,10 +1,12 @@
 import {
+  ConflictException,
   Controller,
   Delete,
   Get,
   NotFoundException,
   Param,
   ParseUUIDPipe,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AdminAuthGuard } from 'src/auth/admin-auth.guard';
@@ -30,9 +32,14 @@ export class UsersController {
   @Delete('/:id')
   @UseGuards(AdminAuthGuard)
   @UseGuards(JwtAuthGuard)
-  async deleteById(@Param('id', new ParseUUIDPipe()) id: string) {
+  async deleteById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Request() req,
+  ) {
     if (!(await this.usersService.getById(id)))
       throw new NotFoundException('User not found');
+    if (id === req.user.id)
+      throw new ConflictException('You cannot delete yourself');
     await this.usersService.delete(id);
     return { success: true };
   }

@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { Book } from '@prisma/client';
+import { Book, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -67,6 +67,29 @@ export class BooksService {
         throw new ConflictException('Title is already taken');
       if (error.code === 'P2025')
         throw new ConflictException("Author doesn't exist");
+      throw error;
+    }
+  }
+
+  public async bookLike(bookId: Book['id'], userId: User['id']): Promise<Book> {
+    try {
+      return await this.prismaService.book.update({
+        where: { id: bookId },
+        data: {
+          users: {
+            create: {
+              user: {
+                connect: { id: userId },
+              },
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2002')
+        throw new ConflictException('You already liked this book');
+      if (error.code === 'P2025')
+        throw new ConflictException("Book doesn't exist");
       throw error;
     }
   }

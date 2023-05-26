@@ -57,4 +57,15 @@ export class BooksController {
     await this.booksService.updateBook(id, bookData);
     return { success: true };
   }
+
+  @Post('/like')
+  @UseGuards(JwtAuthGuard)
+  async bookLike(
+    @Body('bookId', new ParseUUIDPipe()) bookId: string,
+    @Body('userId', new ParseUUIDPipe()) userId: string,
+  ) {
+    if (!(await this.booksService.getById(bookId)))
+      throw new NotFoundException('Book not found');
+    return this.booksService.bookLike(bookId, userId);
+  }
 }
